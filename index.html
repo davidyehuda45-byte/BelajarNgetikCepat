@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Speed Test</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="logo">type<span>craft</span></h1>
+      <div class="config">
+        <div class="config-group" id="lang-selector">
+          <button class="active" data-lang="indonesia">indonesia</button>
+          <button data-lang="english">english</button>
+        </div>
+        <div class="divider"></div>
+        <div class="config-group" id="time-selector">
+          <button data-time="15">15s</button>
+          <button class="active" data-time="30">30s</button>
+          <button data-time="60">60s</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="timer-display" id="timer">30</div>
+
+    <div class="words-wrapper" id="words-wrapper">
+      <div class="words" id="words"></div>
+      <input type="text" id="hidden-input" autocomplete="off" autocapitalize="none">
+    </div>
+
+    <button id="restart-btn" class="restart-btn" title="Restart Test">🔄</button>
+
+    <div class="result-container hidden" id="result-container">
+      <div class="stats-overview">
+        <div class="stat-box">
+          <span class="stat-title">wpm</span>
+          <span class="stat-value" id="res-wpm">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-title">acc</span>
+          <span class="stat-value" id="res-acc">0%</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-title">characters</span>
+          <span class="stat-value" id="res-chars">0/0</span>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="wpmChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

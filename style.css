@@ -1,0 +1,183 @@
+:root {
+  --bg-color: #1e1e2e;
+  --main-color: #ff79c6; /* Pink Utama */
+  --sub-color: #6272a4;  /* Warna Teks Default/Belum Diketik */
+  --text-color: #f8f8f2;
+  --correct-color: #ff79c6; /* PINK untuk Huruf Benar */
+  --error-color: #ff5555;   /* MERAH untuk Huruf Salah */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Courier New', Courier, monospace, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: var(--sub-color);
+  font-size: 1.8rem;
+}
+.logo span { color: var(--main-color); }
+
+.config {
+  display: flex;
+  background: rgba(255,255,255,0.05);
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  gap: 1rem;
+}
+
+.config-group button {
+  background: none;
+  border: none;
+  color: var(--sub-color);
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 0 4px;
+  transition: 0.2s;
+}
+
+.config-group button:hover, .config-group button.active {
+  color: var(--main-color);
+}
+
+.divider {
+  width: 2px;
+  background-color: var(--sub-color);
+  opacity: 0.3;
+}
+
+.timer-display {
+  font-size: 2rem;
+  color: var(--main-color);
+  font-weight: bold;
+}
+
+.words-wrapper {
+  position: relative;
+  height: 140px;
+  overflow: hidden;
+  cursor: text;
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.8rem;
+  font-size: 1.6rem;
+  line-height: 2rem;
+  color: var(--sub-color); /* Warna Asli Teks (Abu-abu Biru) */
+  user-select: none;
+}
+
+.word {
+  display: flex;
+}
+
+.letter {
+  position: relative;
+  transition: color 0.1s ease;
+}
+
+/* ATURAN WARNA SESUAI PERMINTAAN */
+.letter.correct { 
+  color: var(--correct-color) !important; /* PINK */
+  font-weight: bold;
+}
+
+.letter.incorrect { 
+  color: var(--error-color) !important;   /* MERAH */
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Kursor Kedip-kedip Warna Pink */
+.letter.current::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10%;
+  height: 80%;
+  width: 2.5px;
+  background-color: var(--main-color);
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+#hidden-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  width: 0;
+}
+
+.restart-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  align-self: center;
+  transition: transform 0.2s;
+  color: var(--sub-color);
+}
+
+.restart-btn:hover {
+  transform: rotate(90deg);
+  color: var(--main-color);
+}
+
+.result-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.result-container.hidden { display: none; }
+
+.stats-overview {
+  display: flex;
+  gap: 3rem;
+}
+
+.stat-box { display: flex; flex-direction: column; }
+.stat-title { color: var(--sub-color); font-size: 1rem; }
+.stat-value { color: var(--main-color); font-size: 3rem; font-weight: bold; }
+
+.chart-wrapper {
+  background: rgba(0,0,0,0.2);
+  padding: 1rem;
+  border-radius: 8px;
+}
