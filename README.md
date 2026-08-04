@@ -1,3 +1,8 @@
+# Belajar Ngetik Cepat (Typing Speed Test)
+
+[🌐 Lihat Live Demo Aplikasi](https://belajar-ngetik-cepat.vercel.app/)
+
+
 # ⌨️ Belajar Ngetik Cepat (Typing Speed Test)
 
 Aplikasi tes kecepatan mengetik (*Typing Speed Test*) interaktif yang dibangun menggunakan **Vanilla JavaScript murni**. Proyek ini dirancang dengan tampilan antarmuka yang modern, responsif, serta dilengkapi dengan fitur analisis statistik *real-time*.
