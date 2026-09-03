@@ -2,60 +2,231 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Typing Speed Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1e1e2e" id="meta-theme-color">
+  <meta name="description" content="Latihan mengetik cepat (typing test) — ringan, bisa dipakai di HP, tanpa iklan.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>typecraft — latihan ngetik cepat</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <header>
+  <div class="app">
+    <header class="topbar">
       <h1 class="logo">type<span>craft</span></h1>
-      <div class="config">
-        <div class="config-group" id="lang-selector">
-          <button class="active" data-lang="indonesia">indonesia</button>
-          <button data-lang="english">english</button>
-        </div>
-        <div class="divider"></div>
-        <div class="config-group" id="time-selector">
-          <button data-time="15">15s</button>
-          <button class="active" data-time="30">30s</button>
-          <button data-time="60">60s</button>
-        </div>
+      <div class="topbar-actions">
+        <button type="button" class="icon-btn" id="btn-keyboard" aria-label="Keyboard layar" title="Keyboard layar">⌨</button>
+        <button type="button" class="icon-btn" id="btn-history" aria-label="Riwayat &amp; rekor" title="Riwayat &amp; rekor">📊</button>
+        <button type="button" class="icon-btn" id="btn-settings" aria-label="Pengaturan" title="Pengaturan">⚙</button>
       </div>
     </header>
 
-    <div class="timer-display" id="timer">30</div>
+    <nav class="config" aria-label="Pengaturan tes">
+      <div class="config-group" id="mode-selector" role="group" aria-label="Mode tes">
+        <button type="button" data-mode="time" class="active">waktu</button>
+        <button type="button" data-mode="words">kata</button>
+        <button type="button" data-mode="quote">kutipan</button>
+        <button type="button" data-mode="code">kode</button>
+        <button type="button" data-mode="custom">kustom</button>
+        <button type="button" data-mode="zen">bebas</button>
+      </div>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="config-group" id="value-selector" role="group" aria-label="Durasi / jumlah kata">
+        <!-- diisi oleh app.js sesuai mode -->
+      </div>
+    </nav>
 
-    <div class="words-wrapper" id="words-wrapper">
-      <div class="words" id="words"></div>
-      <input type="text" id="hidden-input" autocomplete="off" autocapitalize="none">
-    </div>
+    <nav class="config config--toggles" aria-label="Opsi tambahan">
+      <div class="config-group" id="toggle-selector" role="group" aria-label="Opsi tambahan">
+        <button type="button" data-toggle="punctuation" title="Sisipkan tanda baca">@ punctuation</button>
+        <button type="button" data-toggle="numbers" title="Sisipkan angka"># numbers</button>
+        <button type="button" data-toggle="focusMode" title="Redupkan kata lain">◎ focus</button>
+        <button type="button" data-toggle="typoStop" title="Berhenti kalau salah ketik">✖ typo stop</button>
+      </div>
+    </nav>
 
-    <button id="restart-btn" class="restart-btn" title="Restart Test">🔄</button>
+    <section class="test-area" aria-label="Area mengetik">
+      <div class="live-bar">
+        <div class="live-stat">
+          <span class="live-label">wpm</span>
+          <span class="live-value" id="live-wpm">0</span>
+        </div>
+        <div class="live-stat">
+          <span class="live-label">acc</span>
+          <span class="live-value" id="live-acc">100%</span>
+        </div>
+        <div class="timer-display" id="timer" role="timer" aria-live="off">30</div>
+        <canvas id="live-chart" class="live-chart" width="160" height="44" aria-hidden="true"></canvas>
+      </div>
 
-    <div class="result-container hidden" id="result-container">
-      <div class="stats-overview">
-        <div class="stat-box">
+      <div class="words-wrapper" id="words-wrapper">
+        <div class="words" id="words">
+          <div class="caret" id="caret" aria-hidden="true"></div>
+        </div>
+
+        <!-- Input asli: dibuat berukuran penuh (bukan opacity:0 + 0px) supaya
+             keyboard HP mau muncul. Teksnya transparan, kursor digambar sendiri. -->
+        <textarea id="typing-input" class="typing-input" rows="1"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          enterkeyhint="done" aria-label="Ketik di sini"></textarea>
+
+        <button type="button" class="tap-hint" id="tap-hint">
+          <span class="tap-hint-icon">👆</span>
+          <span>Klik untuk mulai mengetik</span>
+        </button>
+      </div>
+
+      <div class="progress" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+
+      <div class="controls">
+        <span class="shortcut-hint">tab / esc — ulang</span>
+        <button type="button" id="restart-btn" class="restart-btn" title="Ulangi tes (Tab)">↻</button>
+      </div>
+    </section>
+
+    <section class="result hidden" id="result-container" aria-live="polite">
+      <div class="best-banner hidden" id="best-banner">🏆 rekor baru!</div>
+      <div class="result-headline">
+        <div class="headline-main">
           <span class="stat-title">wpm</span>
           <span class="stat-value" id="res-wpm">0</span>
         </div>
-        <div class="stat-box">
+        <div class="headline-main">
           <span class="stat-title">acc</span>
           <span class="stat-value" id="res-acc">0%</span>
         </div>
-        <div class="stat-box">
-          <span class="stat-title">characters</span>
-          <span class="stat-value" id="res-chars">0/0</span>
-        </div>
+      </div>
+      <div class="stats-overview" id="stats-overview">
+        <div class="stat-box"><span class="stat-title">raw</span><span class="stat-mini" id="res-raw">0</span></div>
+        <div class="stat-box"><span class="stat-title">konsistensi</span><span class="stat-mini" id="res-consistency">0%</span></div>
+        <div class="stat-box"><span class="stat-title">karakter</span><span class="stat-mini" id="res-chars">0/0/0/0</span></div>
+        <div class="stat-box"><span class="stat-title">waktu</span><span class="stat-mini" id="res-time">0s</span></div>
       </div>
       <div class="chart-wrapper">
-        <canvas id="wpmChart"></canvas>
+        <canvas id="wpmChart" aria-label="Grafik wpm per detik"></canvas>
       </div>
-    </div>
+      <div class="result-actions">
+        <button type="button" class="btn btn--primary" id="next-test-btn">tes berikutnya</button>
+        <button type="button" class="btn" id="copy-result-btn">salin hasil</button>
+        <button type="button" class="btn" id="share-result-btn">bagikan</button>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <span id="storage-note"></span>
+      <span>dibuat untuk latihan ngetik — jalan offline</span>
+    </footer>
   </div>
 
+  <!-- Drawer: pengaturan -->
+  <aside class="drawer" id="settings-drawer" aria-hidden="true" aria-label="Pengaturan">
+    <div class="drawer-head">
+      <h2>pengaturan</h2>
+      <button type="button" class="icon-btn" data-close-drawer aria-label="Tutup">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="setting">
+        <span class="setting-label">bahasa</span>
+        <div class="pill-group" id="lang-selector">
+          <button type="button" data-lang="indonesia">indonesia</button>
+          <button type="button" data-lang="english">english</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <span class="setting-label">tema</span>
+        <div class="pill-group pill-group--themes" id="theme-selector"></div>
+      </div>
+
+      <div class="setting">
+        <span class="setting-label">ukuran huruf</span>
+        <div class="pill-group" id="fontsize-selector">
+          <button type="button" data-fontsize="sm">kecil</button>
+          <button type="button" data-fontsize="md">sedang</button>
+          <button type="button" data-fontsize="lg">besar</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <span class="setting-label">gaya kursor</span>
+        <div class="pill-group" id="caret-selector">
+          <button type="button" data-caret="line">garis</button>
+          <button type="button" data-caret="block">blok</button>
+          <button type="button" data-caret="underline">garis bawah</button>
+          <button type="button" data-caret="off">mati</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <span class="setting-label">keyboard layar</span>
+        <div class="pill-group" id="vkbd-selector">
+          <button type="button" data-vkbd="auto">otomatis</button>
+          <button type="button" data-vkbd="on">selalu</button>
+          <button type="button" data-vkbd="off">mati</button>
+        </div>
+      </div>
+
+      <div class="setting setting--switch">
+        <span class="setting-label">kursor halus</span>
+        <button type="button" class="switch" id="switch-smoothCaret" role="switch" aria-checked="true"></button>
+      </div>
+      <div class="setting setting--switch">
+        <span class="setting-label">suara ketikan</span>
+        <button type="button" class="switch" id="switch-sound" role="switch" aria-checked="false"></button>
+      </div>
+      <div class="setting setting--switch">
+        <span class="setting-label">sorot tombol berikutnya</span>
+        <button type="button" class="switch" id="switch-showNextKey" role="switch" aria-checked="true"></button>
+      </div>
+      <div class="setting setting--switch">
+        <span class="setting-label">grafik langsung</span>
+        <button type="button" class="switch" id="switch-liveChart" role="switch" aria-checked="false"></button>
+      </div>
+
+      <div class="setting setting--custom">
+        <span class="setting-label">kata kustom (mode kustom)</span>
+        <textarea id="custom-words" class="custom-words" rows="3"
+          placeholder="pisahkan kata dengan spasi, contoh: saya belajar mengetik cepat"></textarea>
+        <button type="button" class="btn btn--small" id="apply-custom-words">pakai kata kustom</button>
+      </div>
+
+      <button type="button" class="btn btn--danger btn--small" id="reset-settings">kembalikan pengaturan awal</button>
+    </div>
+  </aside>
+
+  <!-- Drawer: riwayat -->
+  <aside class="drawer" id="history-drawer" aria-hidden="true" aria-label="Riwayat dan rekor">
+    <div class="drawer-head">
+      <h2>riwayat &amp; rekor</h2>
+      <button type="button" class="icon-btn" data-close-drawer aria-label="Tutup">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="summary-cards" id="summary-cards"></div>
+      <h3 class="drawer-subtitle">rekor per mode</h3>
+      <ul class="best-list" id="best-list"></ul>
+      <h3 class="drawer-subtitle">tes terakhir</h3>
+      <ul class="history-list" id="history-list"></ul>
+      <button type="button" class="btn btn--danger btn--small" id="clear-history">hapus riwayat</button>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <div class="vkbd-mount" id="vkbd-mount" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript>
+    <p style="padding:2rem;text-align:center">Aplikasi ini butuh JavaScript untuk berjalan.</p>
+  </noscript>
+
   <script src="words.js"></script>
+  <script src="engine.js"></script>
+  <script src="store.js"></script>
+  <script src="chart.js"></script>
+  <script src="keyboard.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
