@@ -1,60 +1,240 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Typing Speed Test</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TypeCraft — Typing Speed Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1 class="logo">type<span>craft</span></h1>
-      <div class="config">
-        <div class="config-group" id="lang-selector">
-          <button class="active" data-lang="indonesia">indonesia</button>
-          <button data-lang="english">english</button>
-        </div>
-        <div class="divider"></div>
-        <div class="config-group" id="time-selector">
-          <button data-time="15">15s</button>
-          <button class="active" data-time="30">30s</button>
-          <button data-time="60">60s</button>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">⌨</span>
+        <span class="logo-text">type<span class="accent">craft</span></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <button class="icon-btn" id="historyBtn" title="View history" aria-label="View history">
+        <span>📊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- Config Bar -->
+    <div class="config-bar">
+      <!-- Language -->
+      <div class="config-group">
+        <span class="config-label">lang</span>
+        <div class="config-options" id="langOptions">
+          <button class="config-btn active" data-value="indonesia">🇮🇩 id</button>
+          <button class="config-btn" data-value="english">🇬🇧 en</button>
         </div>
       </div>
-    </header>
 
-    <div class="timer-display" id="timer">30</div>
+      <div class="config-divider"></div>
 
-    <div class="words-wrapper" id="words-wrapper">
-      <div class="words" id="words"></div>
-      <input type="text" id="hidden-input" autocomplete="off" autocapitalize="none">
+      <!-- Mode -->
+      <div class="config-group">
+        <span class="config-label">mode</span>
+        <div class="config-options" id="modeOptions">
+          <button class="config-btn active" data-value="time">⏱ time</button>
+          <button class="config-btn" data-value="words">📝 words</button>
+        </div>
+      </div>
+
+      <div class="config-divider"></div>
+
+      <!-- Time -->
+      <div class="config-group" id="timeGroup">
+        <span class="config-label">duration</span>
+        <div class="config-options" id="timeOptions">
+          <button class="config-btn" data-value="15">15</button>
+          <button class="config-btn active" data-value="30">30</button>
+          <button class="config-btn" data-value="60">60</button>
+          <button class="config-btn" data-value="120">120</button>
+        </div>
+      </div>
+
+      <!-- Word Count (hidden by default) -->
+      <div class="config-group hidden" id="wordGroup">
+        <span class="config-label">words</span>
+        <div class="config-options" id="wordCountOptions">
+          <button class="config-btn" data-value="10">10</button>
+          <button class="config-btn active" data-value="25">25</button>
+          <button class="config-btn" data-value="50">50</button>
+          <button class="config-btn" data-value="100">100</button>
+        </div>
+      </div>
+
+      <div class="config-divider"></div>
+
+      <!-- Punctuation & Numbers toggles -->
+      <div class="config-group">
+        <span class="config-label">extras</span>
+        <div class="config-options">
+          <button class="config-btn toggle-btn" id="togglePunctuation" data-active="false">@# punct</button>
+          <button class="config-btn toggle-btn" id="toggleNumbers" data-active="false">123 nums</button>
+        </div>
+      </div>
     </div>
 
-    <button id="restart-btn" class="restart-btn" title="Restart Test">🔄</button>
+    <!-- ===== TYPING AREA ===== -->
+    <div class="typing-card" id="typingCard">
 
-    <div class="result-container hidden" id="result-container">
-      <div class="stats-overview">
-        <div class="stat-box">
-          <span class="stat-title">wpm</span>
-          <span class="stat-value" id="res-wpm">0</span>
+      <!-- Caps Lock Warning -->
+      <div class="caps-warning hidden" id="capsWarning">
+        ⚠ CAPS LOCK ON
+      </div>
+
+      <!-- Timer / Word Counter Display -->
+      <div class="timer-display" id="timerDisplay">
+        <span id="timerValue">30</span>
+        <span class="timer-label" id="timerLabel">seconds</span>
+      </div>
+
+      <!-- Live Stats Bar (shows while typing) -->
+      <div class="live-stats hidden" id="liveStats">
+        <div class="live-stat">
+          <span class="live-stat-value" id="liveWpm">0</span>
+          <span class="live-stat-label">wpm</span>
         </div>
-        <div class="stat-box">
-          <span class="stat-title">acc</span>
-          <span class="stat-value" id="res-acc">0%</span>
+        <div class="live-stat">
+          <span class="live-stat-value" id="liveAcc">100</span>
+          <span class="live-stat-label">acc %</span>
         </div>
-        <div class="stat-box">
-          <span class="stat-title">characters</span>
-          <span class="stat-value" id="res-chars">0/0</span>
+        <div class="live-stat">
+          <span class="live-stat-value" id="liveErrors">0</span>
+          <span class="live-stat-label">errors</span>
         </div>
       </div>
+
+      <!-- Words Display -->
+      <div class="words-wrapper" id="wordsWrapper">
+        <div class="words" id="words"></div>
+        <textarea
+          class="hidden-input"
+          id="hiddenInput"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Type here"
+          rows="1"
+        ></textarea>
+      </div>
+
+      <!-- Caret indicator for mobile -->
+      <div class="mobile-hint" id="mobileHint">
+        <span>Tap here to start typing</span>
+      </div>
+    </div>
+
+    <!-- Restart Button -->
+    <div class="action-bar">
+      <button class="restart-btn" id="restartBtn" title="Restart (Tab + Enter)" aria-label="Restart test">
+        <span class="restart-icon">↺</span>
+        <span class="restart-text">restart</span>
+      </button>
+      <span class="hint-text">Tab + Enter to restart</span>
+    </div>
+
+  </main>
+
+  <!-- ===== RESULT OVERLAY ===== -->
+  <div class="result-overlay hidden" id="resultOverlay">
+    <div class="result-card">
+      <div class="result-header">
+        <h2 class="result-title">Test Complete</h2>
+        <button class="icon-btn close-btn" id="closeResult" aria-label="Close">✕</button>
+      </div>
+
+      <!-- Main Stats -->
+      <div class="result-stats-main">
+        <div class="result-stat-big">
+          <span class="result-stat-value" id="resultWpm">0</span>
+          <span class="result-stat-label">WPM</span>
+        </div>
+        <div class="result-stat-big">
+          <span class="result-stat-value" id="resultAcc">0</span>
+          <span class="result-stat-label">Accuracy</span>
+        </div>
+      </div>
+
+      <!-- Secondary Stats -->
+      <div class="result-stats-secondary">
+        <div class="result-stat-small">
+          <span class="result-stat-value" id="resultRaw">0</span>
+          <span class="result-stat-label">raw wpm</span>
+        </div>
+        <div class="result-stat-small">
+          <span class="result-stat-value" id="resultChars">0</span>
+          <span class="result-stat-label">chars</span>
+        </div>
+        <div class="result-stat-small">
+          <span class="result-stat-value" id="resultErrors">0</span>
+          <span class="result-stat-label">errors</span>
+        </div>
+        <div class="result-stat-small">
+          <span class="result-stat-value" id="resultConsistency">0</span>
+          <span class="result-stat-label">consistency</span>
+        </div>
+      </div>
+
+      <!-- Chart -->
       <div class="chart-wrapper">
         <canvas id="wpmChart"></canvas>
+      </div>
+
+      <!-- Personal Best Badge -->
+      <div class="pb-badge hidden" id="pbBadge">
+        🏆 New Personal Best!
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="result-actions">
+        <button class="btn-primary" id="resultRestart">Try Again</button>
+        <button class="btn-secondary" id="resultHistory">View History</button>
       </div>
     </div>
   </div>
 
+  <!-- ===== HISTORY MODAL ===== -->
+  <div class="modal-overlay hidden" id="historyModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">📊 History</h2>
+        <button class="icon-btn close-btn" id="closeHistory" aria-label="Close">✕</button>
+      </div>
+      <div class="history-filters">
+        <button class="config-btn active" data-filter="all" id="filterAll">All</button>
+        <button class="config-btn" data-filter="indonesia" id="filterID">🇮🇩 ID</button>
+        <button class="config-btn" data-filter="english" id="filterEN">🇬🇧 EN</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <!-- populated by JS -->
+      </div>
+      <div class="history-empty hidden" id="historyEmpty">
+        <span>No tests recorded yet.</span><br/>
+        <small>Complete a test to see your history.</small>
+      </div>
+      <button class="btn-danger" id="clearHistory">Clear History</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="words.js"></script>
   <script src="app.js"></script>
 </body>
